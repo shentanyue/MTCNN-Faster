@@ -472,43 +472,102 @@ vector<FaceInfo> MTCNN::Detect_mtcnn(const cv::Mat& image, const int minSize, co
     }
 }
 
+//int main(int argc, char **argv)
+//{
+//
+//    MTCNN detector("model");
+//    string name_list[1] = {
+//		"test.jpg",
+//	};
+//
+////	MTCNN detector("./model");
+//	float factor = 0.709f;      //准确度
+//	float threshold[3] = { 0.7f, 0.85f, 0.9f }; //三层网络每层的阈值
+//	int minSize = 80;   //人脸识别最小尺寸
+//	for (int n = 0; n < 1;++n){
+//		cv::Mat image = cv::imread(name_list[0], 1);
+//
+//        for(int i = 0 ; i < 10 ; i ++) {
+//            double t = (double) cv::getTickCount();
+//            vector<FaceInfo> faceInfo = detector.Detect_mtcnn(image, minSize, threshold, factor, 3);
+//            std::cout << name_list[n] << " time," << (double) (cv::getTickCount() - t) / cv::getTickFrequency() << "s"
+//                      << std::endl;
+//
+//            for (int i = 0; i < faceInfo.size(); i++) {
+//                int x = (int) faceInfo[i].bbox.xmin;
+//                int y = (int) faceInfo[i].bbox.ymin;
+//                int w = (int) (faceInfo[i].bbox.xmax - faceInfo[i].bbox.xmin + 1);
+//                int h = (int) (faceInfo[i].bbox.ymax - faceInfo[i].bbox.ymin + 1);
+//                cv::rectangle(image, cv::Rect(x, y, w, h), cv::Scalar(255, 0, 0), 2);
+//            }
+//            //cv::imwrite("test.png", image);
+//            cv::imshow("image", image);
+//            cv::waitKey(0);
+//
+//        }
+//
+//
+//    }
+//
+//
+//	return 1;
+//}
+
+
+
 int main(int argc, char **argv)
 {
+  int frame_num =0;
+  MTCNN detector("model");
+  float CROP_RATIO = 0; //0.5;    //图像剪切比例
+  int speedx = 5;
+  VideoCapture cap("./images/haiguang.mp4");    //("rtsp://192.168.1.33:8554/4.264");
+  if (!cap.isOpened())
+  {
+    return -1;
+  }
+  Mat image;
+  Mat frame;
+  Mat imgDst;
 
-    MTCNN detector("model");
-    string name_list[1] = {
-		"test.jpg",
-	};
-
-//	MTCNN detector("./model");
-	float factor = 0.709f;
-	float threshold[3] = { 0.7f, 0.85f, 0.9f };
-	int minSize = 80;
-	for (int n = 0; n < 1;++n){
-		cv::Mat image = cv::imread(name_list[0], 1);
-
-        for(int i = 0 ; i < 10 ; i ++) {
-            double t = (double) cv::getTickCount();
-            vector<FaceInfo> faceInfo = detector.Detect_mtcnn(image, minSize, threshold, factor, 3);
-            std::cout << name_list[n] << " time," << (double) (cv::getTickCount() - t) / cv::getTickFrequency() << "s"
-                      << std::endl;
-
-            for (int i = 0; i < faceInfo.size(); i++) {
-                int x = (int) faceInfo[i].bbox.xmin;
-                int y = (int) faceInfo[i].bbox.ymin;
-                int w = (int) (faceInfo[i].bbox.xmax - faceInfo[i].bbox.xmin + 1);
-                int h = (int) (faceInfo[i].bbox.ymax - faceInfo[i].bbox.ymin + 1);
-                cv::rectangle(image, cv::Rect(x, y, w, h), cv::Scalar(255, 0, 0), 2);
-            }
-            //cv::imwrite("test.png", image);
-            cv::imshow("image", image);
-            cv::waitKey(0);
-
-        }
-
-
+  float factor = 0.709f;    //0.60f;    //0.709f;准确度
+  float threshold[3] = { 0.7f, 0.85f, 0.9f };    //三层网络每层的阈值
+  int minSize = 60;    //65;    //人脸识别最小尺寸
+  while (1)
+  {
+    if (!cap.read(frame))
+    {
+      cout << "Video is end!" << endl;
+      break;
     }
- 
-	 
-	return 1;
+    frame_num++;
+    if (frame_num % speedx == 0)
+    {
+      double start_time = (double) cv::getTickCount();
+      // std::cout<<"frame.rows:"<<frame.rows<<"    frame.cols:"<<frame.cols<<std::endl;
+     // resize(image, frame, Size(image.cols, image.rows), 0, 0, INTER_LINEAR);
+    Rect cropDown(0, (CROP_RATIO) * frame.rows, frame.cols, frame.rows - (CROP_RATIO) * frame.rows);
+      frame = frame(cropDown).clone();
+      vector<FaceInfo> faceInfo = detector.Detect_mtcnn(frame, minSize, threshold, factor, 3);
+      for (int i = 0; i < faceInfo.size(); i++)
+      {
+        int x = (int) faceInfo[i].bbox.xmin;
+        int y = (int) faceInfo[i].bbox.ymin;
+        int w = (int) (faceInfo[i].bbox.xmax - faceInfo[i].bbox.xmin + 1);
+        int h = (int) (faceInfo[i].bbox.ymax - faceInfo[i].bbox.ymin + 1);
+       cv::rectangle(frame, cv::Rect(x, y, w, h), cv::Scalar(255, 0, 0), 2);
+//        double current_time = (double) cv::getTickCount();
+//        string filenameFace = "./data/" + to_string(current_time) + ".jpg";
+//        cv::resize(frame(cv::Rect(x, y, w, h)), imgDst, Size(60, 80));
+//        cv::imwrite(filenameFace, imgDst);
+//        cv::rectangle(frame, cv::Rect(x, y, w, h), cv::Scalar(255, 0, 0), 2);
+      }
+     cv::imshow("image", frame);
+     cv::waitKey(1);
+     double end_time = (double) cv::getTickCount();
+     std::cout << "Face num:" << faceInfo.size() << std::endl;
+     std::cout << " time," << (double) (end_time - start_time) / cv::getTickFrequency() << "s" << "   faceInfo.size:" << faceInfo.size() << std::endl;
+    }
+  }
+  return 1;
 }
