@@ -1,6 +1,6 @@
 # Fast-MTCNN
 
-A casual work about retainining mtcnn Pnet and Onet. make it a little bit fast,which achiciving 100fps+ (1920*1080 minSize 60) at intel i7 6700k (st),but the accuracy is not so well.
+A casual work about retainining mtcnn Pnet and Onet. make it a little bit fast,which achiciving 15ms(1024*1024 minSize 60) at E5 but the accuracy is not so well.
 
 ## Dependencies
 
