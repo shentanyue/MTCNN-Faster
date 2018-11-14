@@ -520,7 +520,7 @@ int main(int argc, char **argv)
   int frame_num =0;
   MTCNN detector("model");
   float CROP_RATIO = 0; //0.5;    //图像剪切比例
-  int speedx = 5;
+  int speedx = 1;
   VideoCapture cap("./images/haiguang.mp4");    //("rtsp://192.168.1.33:8554/4.264");
   if (!cap.isOpened())
   {
@@ -531,8 +531,8 @@ int main(int argc, char **argv)
   Mat imgDst;
 
   float factor = 0.709f;    //0.60f;    //0.709f;准确度
-  float threshold[3] = { 0.7f, 0.85f, 0.9f };    //三层网络每层的阈值
-  int minSize = 60;    //65;    //人脸识别最小尺寸
+  float threshold[3] = { 0.8f, 0.85f, 0.9f };    //三层网络每层的阈值
+  int minSize = 100;    //65;    //人脸识别最小尺寸
   while (1)
   {
     if (!cap.read(frame))
@@ -562,8 +562,8 @@ int main(int argc, char **argv)
 //        cv::imwrite(filenameFace, imgDst);
 //        cv::rectangle(frame, cv::Rect(x, y, w, h), cv::Scalar(255, 0, 0), 2);
       }
-     cv::imshow("image", frame);
-     cv::waitKey(1);
+     //cv::imshow("image", frame);
+     //cv::waitKey(1);
      double end_time = (double) cv::getTickCount();
      std::cout << "Face num:" << faceInfo.size() << std::endl;
      std::cout << " time," << (double) (end_time - start_time) / cv::getTickFrequency() << "s" << "   faceInfo.size:" << faceInfo.size() << std::endl;
