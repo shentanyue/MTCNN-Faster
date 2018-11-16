@@ -7,3 +7,6 @@ A casual work about retainining mtcnn Pnet and Onet. make it a little bit fast,w
 + OpenCV 3.4.1 only
 
   ​
+##Run
+
+Modify video/image Path in mtcnn_opencv.cpp
