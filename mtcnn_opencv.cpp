@@ -517,7 +517,7 @@ int main(int argc, char **argv)
 {
   int frame_num =0;
   MTCNN detector("model");
-  float CROP_RATIO = 0; //0.5;    //图像剪切比例
+
   int speedx = 1;
   VideoCapture cap("./images/haiguang.mp4");
   if (!cap.isOpened())
@@ -527,10 +527,10 @@ int main(int argc, char **argv)
   Mat image;
   Mat frame;
   Mat imgDst;
-
-  float factor = 0.709f;    //0.60f;    //0.709f;准确度
-  float threshold[3] = { 0.8f, 0.85f, 0.9f };    //三层网络每层的阈值
-  int minSize = 65;    //65;    //人脸识别最小尺寸
+  float CROP_RATIO = 0; //0.5;    //Image cut ratio
+  float factor = 0.709f;    //0.709f;Accuracy
+  float threshold[3] = { 0.8f, 0.85f, 0.9f };    //Threshold of each layer of the three-layer network
+  int minSize = 65;    //65;    //Minimum size of face detection
   while (1)
   {
     if (!cap.read(frame))
